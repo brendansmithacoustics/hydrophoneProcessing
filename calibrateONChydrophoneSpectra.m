@@ -86,7 +86,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     % compute power spectrum (PS) or power spectral density (PSD) depending on specified specType and assign to SpectData structure
     if strcmp(specType,'power')
         % note that the factor 1/B corrects for the noise power bandwidth of the window function B
-        PS = 10*log10(1/B * Pss) - S(:,2); % power spectrum in decibels [dB re 1µPa^2] ** Check that dividing by B is actually appropriate - Parseval's theorem vs. Merchant
+        PS = 10*log10(Pss) - S(:,2); % power spectrum in decibels [dB re 1µPa^2]
         PSavg = 10*log10(mean(10.^(PS/10),2)); % time-averaged power spectrum over full file duration [dB re 1µPa^2] 
         PSavgT = 10*log10(1/B * Pss_Tavg) - S(:,2); % time-averaged power spectrum in windows of duration Tavg [dB re 1µPa^2] 
         SpectData.P = PS;
@@ -96,7 +96,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
         SpectData.specUnits = 'dB re 1µPa^2'; % units of P
         SpectData.Tavg = Tavg; % time average duration [s]
     elseif strcmp(specType,'psd')
-        % note that the factor 1/(B*df) corrects for the noise power bandwidth of the window function B, and stanardizes the results to the levels which would result from a 1 Hz bin spacing by dividing by the frequency bin spacing df      
+        % note that the factor 1/(B*df) corrects for the noise power bandwidth of the window function B, and standardizes the results to the levels which would result from a 1 Hz bin spacing by dividing by the frequency bin spacing df      
         PSD = 10*log10(1/(B*df) * Pss) - S(:,2); % power spectral density in decibels [dB re 1µPa^2/Hz]
         PSDavg = 10*log10(mean(10.^(PSD/10),2)); % time-averaged power spectral density over full file duration [dB re 1µPa^2/Hz] 
         PSDavgT = 10*log10(1/(B*df) * Pss_Tavg) - S(:,2); % time-averaged power spectrum in windows of duration Tavg [dB re 1µPa^2/Hz] 

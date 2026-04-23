@@ -4,7 +4,7 @@ clear all; close all; clc
 
 % ------------------------------- INPUTS-----------------------------------
 % directory containing audio files for analysis and sensitivity .txt file
-fdir = '.\hydrophoneProcessing\data\';
+fdir = 'C:\Users\bsmithacoustics\Documents\ONClocal\Code\MATLAB\ONC\hydrophoneProcessing\data\';
 
 % path to audio file
 audioPath = [fdir '\ICLISTENHF6327_20260423T000000.000Z.flac'];
