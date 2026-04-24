@@ -88,7 +88,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
         % note that the factor 1/B corrects for the noise power bandwidth of the window function B
         PS = 10*log10(Pss) - S(:,2); % power spectrum in decibels [dB re 1µPa^2]
         PSavg = 10*log10(mean(10.^(PS/10),2)); % time-averaged power spectrum over full file duration [dB re 1µPa^2] 
-        PSavgT = 10*log10(1/B * Pss_Tavg) - S(:,2); % time-averaged power spectrum in windows of duration Tavg [dB re 1µPa^2] 
+        PSavgT = 10*log10(Pss_Tavg) - S(:,2); % time-averaged power spectrum in windows of duration Tavg [dB re 1µPa^2] 
         SpectData.P = PS;
         SpectData.Pavg = PSavg;
         SpectData.PavgT = PSavgT;
