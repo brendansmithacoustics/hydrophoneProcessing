@@ -26,7 +26,7 @@ Y = Y * 2^(bitDepth-1); % convert Y to counts [counts]
 
 % read sensitivity (calibration) file
 fileID = fopen(calPath,'r');
-Sraw = textscan(fileID,'%f %f','Delimiter',',','HeaderLines', 3); % read both columns as floats, and skip header lines (note older sensitivity .txt files only had one header lines)
+Sraw = textscan(fileID,'%f %f','Delimiter',',','HeaderLines', 3); % read both columns as floats, and skip header lines (note older sensitivity .txt files only had one header line)
 fileStatus = fclose(fileID);
 S(:,1) = Sraw{1,1}; % assign frequency to first column of matrix
 S(:,2) = Sraw{1,2}; % assign sensitivity to second column of matrix
