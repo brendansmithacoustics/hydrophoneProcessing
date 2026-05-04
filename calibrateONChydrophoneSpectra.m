@@ -4,7 +4,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     % Description: Process Ocean Networks Canada single-channel hydrophone audio data to get calibrated power spectrum or power spectral density
     %
     % Syntax:
-    % [SpectData] = calibrateONChydrophoneData(audioPath,calPath,overlapFactor,specType)
+    % [SpectData] = calibrateONChydrophoneSpectra(audioPath,calPath,overlapFactor,specType)
     %
     % Input:    Y: audio time series [counts] - note this must be scaled to digital counts for the result to be calibrated properly
     %           Fs: audio sample rate [Hz]
