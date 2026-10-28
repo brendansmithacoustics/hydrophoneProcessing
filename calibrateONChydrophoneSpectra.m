@@ -11,7 +11,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     %           S: sensitivity data, formatted as a matrix with 1st column: frequency [Hz], 2nd column: sensitivity value [dB re counts/uPa]
     %           df: desired frequency bin spacing [Hz]. Sensitivity file will be interpolated if necessary.
     %           overlapFactor: ratio of overlap between adjacent time windows, typically 0 or 0.5
-    %           specType: either 'power' for power spectrum [dB re 1µPa^2] or 'psd' for power spectral densitiy [dB re 1µPa^2/Hz]
+    %           specType: either 'power' for power spectrum [dB re 1µPa^2] or 'psd' for power spectral density [dB re 1µPa^2/Hz]
     %           Tavg: time averaging duration [s]
     %
     % Output:   SpectData structure containing
@@ -26,7 +26,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     % References:   Merchant et al. (2015) Measuring acoustic habitats, Appendix S1. (https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12330)
     %               Cerna, M. & Harvey, A.F. (2000) The fundamentals of FFT-based signal analysis and measurements, Application Note 041. Tech. rep. (https://www.sjsu.edu/people/burford.furman/docs/me120/FFT_tutorial_NI.pdf)
     %
-    % Date/Author:  2026-04-23, Brendan Smith
+    % Date/Author:  2026-10-28, Brendan Smith
     %---------------------------------------------------------------------
 
     % interpolate sensitivity curve, if df is different than existing frequency resolution
@@ -41,7 +41,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     NFFT = round(Fs/df); % FFT size [samples]
     windowFn = hann(NFFT,'periodic'); % window function
     alpha = 0.5; % coherent gain factor (scaling factor) of hann window, which corrects for the reduction in amplitude introduced by the window function (Cerna & Harvey, 2000)
-    
+
     % divide signal into time segments
     Ywin = buffer(Y,NFFT,round(overlapFactor*NFFT));
     Ywin = Ywin .* windowFn / alpha; % multiply each segment by the window function, and divide by window scaling factor
@@ -51,7 +51,7 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
     P = abs(X/NFFT).^2; % power spectrum
     Pss = P(1:floor(NFFT/2),:); % single-sided power spectrum
     Pss(2:end,:) = 2*Pss(2:end,:); % double values of single-sided power spectrum except for DC
-    F = 0:df:(Fs/2 - df); % frequency vector corresponding to single-sided power spectrum [Hz]
+    F = 0:df:(floor(Fs/2) - df); % frequency vector corresponding to single-sided power spectrum [Hz]
     B = 1/NFFT * sum((windowFn/alpha).^2); % noise power bandwidth of the window function
     
     % crop frequency range to match sensitivity file and compute time vector
@@ -72,11 +72,13 @@ function [SpectData] = calibrateONChydrophoneSpectra(Y,Fs,S,df,overlapFactor,spe
 
     % compute time average of power spectrum, with window length of Tavg
     Pss_Tavg = [];
-    numAvg = floor(size(Pss,2)*dt/Tavg); % number of averaging windows
+    numAvg = (length(Y)/Fs)/Tavg; % number of averaging windows
     if numAvg >= 1
         for i = 1:numAvg
-            startIdx = round(1 + (i-1)*Tavg/dt); % start time index of window
-            endIdx = round(startIdx + Tavg/dt - 1); % end time index of window
+            startTime = (i - 1) * Tavg; % start time of averaging window [s]
+            endTime = i * Tavg; % end time of averaging window [s]
+            [~,startIdx] = min(abs(T - startTime)); % start time index of window
+            [~,endIdx] = min(abs(T - endTime)); % end time index of window
             Pss_Tavg(:,i) = mean(Pss(:,startIdx:endIdx),2); % time average of power spectrum (not in dB units at this point which is why we can just take the mean without un-logging)
         end
     else
